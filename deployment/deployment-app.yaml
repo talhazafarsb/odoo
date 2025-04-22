@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: docker.io/talhazaffar0/odoo-web:latest
+          env:
+            - name: DB_ENV_POSTGRES_USER
+              value: "odoo"
+          ports:
+            - containerPort: 8069
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 8069
+      targetPort: 8069
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web
+spec:
+  to:
+    kind: Service
+    name: web
+  port:
+    targetPort: 8069
+
